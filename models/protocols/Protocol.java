@@ -1,4 +1,4 @@
-package Protocols;
+package models.protocols;
 
 import java.util.List;
 
