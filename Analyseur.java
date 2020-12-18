@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import model.Layer;
+
 public class Analyseur{
     // Lire le fichier hex
 
@@ -87,6 +89,8 @@ public class Analyseur{
     			System.out.print(hexa+" ");
     		}
     	}
+    	Layer l = new Layer("Ethernet", data.get(0));
+    	System.out.println(l);
         System.out.println("Rien");
     }
 }
