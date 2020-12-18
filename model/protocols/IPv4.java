@@ -26,26 +26,24 @@ public class IPv4 extends Protocol {
     private String flagDF;
     private String flagMF;
     private String fragmentOffset;
-    private String timeToLive;
+    private int TTL;
     private String protocol;
-    private String headerChecksum;
+    private String checksum;
     private String srcIP;
     private String dstIP;
     private List<String> options;
 
-    // Debug
-    private boolean checksum;
 
     public IPv4(List<String> data) {
         super(data, 4 * Integer.parseInt(data.get(0).charAt(1)+"",16), 0);
         typeOfService = data.get(1);
         totalLength = data.get(2) + data.get(3);
         identifier = data.get(4) + data.get(5);
-        flags = data.get(6) + data.get(7);
+        flags = data.get(6);
         initFlagsAndFragmentOffset();
-        timeToLive = data.get(8);
+        TTL = Integer.parseInt(data.get(8),16);
         protocol = data.get(9);
-        headerChecksum = data.get(10) + data.get(11);
+        checksum = data.get(10) + data.get(11);
         srcIP = data.subList(12, 16).stream()
                 .map(s -> String.valueOf(Integer.parseInt(s, 16)))
                 .collect(Collectors.joining("."));
@@ -54,7 +52,6 @@ public class IPv4 extends Protocol {
                 .collect(Collectors.joining("."));
 
         initOptions();
-        checksum = checkChecksum();
     }
 
     private void initFlagsAndFragmentOffset() {
@@ -75,13 +72,14 @@ public class IPv4 extends Protocol {
 
     }
 
-    private boolean checkChecksum() {
+    private String checkChecksum() {
         /** Addition des hexas de l'entête
          * Si résultat supérieur à 16 bits :
          * On additionne les 16 bits "high" avec les 16 bits "low" (high et low comme en archi)
          * res = (somme & 0xFFFF) + (somme >> 16)
          * pas d'erreurs si res = 0xFFFF
          */
+    	if (checksum.equals("0000")) return " [validation disabled]";
         List<String> header = new ArrayList<>();
         header.addAll(data.subList(0, 20));
         // On crée la liste d'hexas de 2 octets
@@ -101,14 +99,38 @@ public class IPv4 extends Protocol {
         if (sum > 0xFFFF) {
             sum = (sum >> 16) + (sum & 0xFFFF) ;
         }
-        return sum == 0xFFFF;
+        if(sum == 0xFFFF) return " [Correct]";
+        else return " [Incorrect]";
     }
     
     @Override
     public String toString() {
-    	return "\nInternet Protocol Version 4, srcIP='" + srcIP + '\'' + ", dstIP='" + dstIP + "' { \n \t" 
-    			+ "Flags : " + flags + "\n \t \t" + flagR + " = Reserved bit : Not set \n" + 
-    			
-                '}';
+    	return "\nInternet Protocol Version 4, srcIP=" + srcIP  + ", dstIP=" + dstIP + " { \n" 
+    				+ "\tFlags : 0x" + flags + "\n "
+    					+ toStringFlags()
+    				+ "\tFragment Offset: "+ fragmentOffset + "\n"
+    				+ "\tTime to Live:" + TTL + "\n"
+    				+ "\tProtocol:" + protocol +"\n"
+    				+ "\tHeader checksum: 0x" + checksum + checkChecksum() + "\n" 
+    				+ "\tSource Address: " + srcIP  + "\n"
+    				+ "\tDestination Address: " + dstIP + "\n" 
+                +'}';
+    }
+    
+    private String toStringFlags() {
+    	String not = "Not ";
+    	String res = "\t\t" + flagR + "... .... = Reserved bit : ";
+    	if(flagR.equals("0")) res += not;
+    	res+= "set\n";
+    	
+    	res+= "\t\t" + "." + flagDF + ".. .... = Don't fragment : ";
+    	if(flagR.equals("0")) res += not;
+    	res+= "set\n";
+    	
+    	res+= "\t\t"+ ".." + flagMF + ". .... = More fragment : ";
+    	if(flagR.equals("0")) res += not;
+    	res+= "set\n";
+    	
+    	return res;
     }
 }
