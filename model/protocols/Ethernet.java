@@ -8,18 +8,18 @@ import java.util.stream.Collectors;
  **/
 public class Ethernet extends Protocol {
     private final String srcMac;
-    private final String destMac;
+    private final String dstMac;
     private final String type;
     private final String crc;
 
     public Ethernet(List<String> data) {
         super(data, 14, 0);
-        srcMac = data.subList(0, 6).stream()
+        dstMac = data.subList(0, 6).stream()
                 .map(s -> String.valueOf(s))
                 .collect(Collectors.joining(":"));
 
-        destMac = data.subList(6, 12).stream()
-                .map(s -> String.valueOf(Integer.parseInt(s, 16)))
+        srcMac = data.subList(6, 12).stream()
+                .map(s -> String.valueOf(s))
                 .collect(Collectors.joining(":"));
 
         type = String.join("", data.subList(12, 14));
@@ -29,12 +29,11 @@ public class Ethernet extends Protocol {
 
     @Override
     public String toString() {
-        return "Ethernet{" +
-                "srcMac='" + srcMac + '\'' +
-                ", destMac='" + destMac + '\'' +
-                ", type='0x" + type + '\'' + getType()+
-                ", crc='0x" + crc + '\'' +
-                '}';
+        return "Ethernet II, Src: " + srcMac + ", Dst: " + dstMac + " {\n"
+                +"\tDestination: " + srcMac + "\n" 
+                +"\tSource: " + dstMac + "\n"
+                +"\tType: IPv4 (0x" + type + ")\n"
+                +'}';
     }
     
     public String getType() {
