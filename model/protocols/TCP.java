@@ -8,8 +8,8 @@ public class TCP extends Protocol {
 
 	private int srcport;
 	private int dstport;
-	private int seqnum;
-	private int acknum;
+	private long seqnum;
+	private long acknum;
 	private int headerlength;
 	private String flags;
 	private String reserved;
@@ -33,11 +33,11 @@ public class TCP extends Protocol {
     private String dstIPHex;
 	
     public TCP(List<String> data, List<String> pseudoHeader) {
-        super(data, 4 * Integer.parseInt(data.get(12).charAt(0)+""), 0); // A changer
+        super(data, 4 * Integer.parseInt(data.get(12).charAt(0)+""), 0); 
         srcport = Integer.parseInt((data.get(0) + data.get(1)),16);
         dstport = Integer.parseInt((data.get(2) + data.get(3)),16);
-        seqnum = Integer.parseInt((data.get(4) + data.get(5) + data.get(6) + data.get(7)),16);
-        acknum = Integer.parseInt((data.get(8) + data.get(9) + data.get(10) + data.get(11)),16);
+        seqnum = Long.parseLong((data.get(4) + data.get(5) + data.get(6) + data.get(7)),16);
+        acknum = Long.parseLong((data.get(8) + data.get(9) + data.get(10) + data.get(11)),16);
         headerlength = Integer.parseInt(data.get(12).charAt(0)+"");
         reserved = "0000 00";
         initFlags(data);
@@ -53,7 +53,7 @@ public class TCP extends Protocol {
 
         // Ajout des chiffres significatifs si besoin
         flags = String.format("%12s", Integer.toBinaryString(tmp)).replace(' ', '0');
-        System.out.println(flags);
+        //System.out.println(flags);
         reserved = flags.substring(0,6);
         urg = flags.charAt(6);
         ack = flags.charAt(7);
@@ -79,7 +79,7 @@ public class TCP extends Protocol {
     	pseudoHeader.addAll(tcpData);
     	String length = String.valueOf(tcpData.size() + 8);
     	String l = String.format("%4s",new BigInteger(length).toString(16)).replace(' ', '0');
-    	System.out.println("La taille vaut:" + l.substring(0, 2));
+    	//System.out.println("La taille vaut:" + l.substring(0, 2));
     	pseudoHeader.add(l.substring(0, 2));
     	pseudoHeader.add(l.substring(2, 4));
     	pseudoHeader.add(l.substring(0, 2));
@@ -136,6 +136,7 @@ public class TCP extends Protocol {
     				+ "\tWindow: " + window + "\n"
     				+ "\tChecksum: 0x" + checksum + checkChecksum() + "\n"
     				+ "\tUrgent pointer: " + urgpointer + "\n"
+    				+ "\tTCP payload (" + getPayload().size() + " bytes)\n"
                 +'}';
     }
     

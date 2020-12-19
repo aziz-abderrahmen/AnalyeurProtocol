@@ -32,6 +32,9 @@ public class IPv4 extends Protocol {
     private String srcIP;
     private String dstIP;
     private List<String> options;
+    private int optionlength;
+    private List<String> routeRecord = new ArrayList<>();
+    private int pointer;
     
     //Pour avoir le pseudo entête pour TCP 
     
@@ -56,8 +59,8 @@ public class IPv4 extends Protocol {
         dstIP = data.subList(16, 20).stream()
                 .map(s -> String.valueOf(Integer.parseInt(s, 16)))
                 .collect(Collectors.joining("."));
-        initOptions();
-        
+        int taille = Integer.parseInt(data.get(0).charAt(1)+"",16) * 4;
+        if(taille>20) initOptions(data.subList(20, taille));
         pseudoHeader = data.subList(12, 20);
     }
 
@@ -75,8 +78,21 @@ public class IPv4 extends Protocol {
         fragmentOffset = new BigInteger(binaryValue.substring(3), 2).toString(16);
     }
 
-    private void initOptions(){
-
+    private void initOptions(List<String> options){
+    	switch(options.get(0)) {
+    		case("00"):
+    			break;
+    		case("07"):
+    			optionlength = Integer.parseInt(options.get(1),16);
+    			pointer = Integer.parseInt(options.get(2),16);
+    			//System.out.println("le pointer vaut" + pointer + "et optionslength vaut: " +optionlength);
+    			for(int i = 3; i<=optionlength-4; i+=4) {
+    				routeRecord.add(options.subList(i, i+4).stream()
+    		                .map(s -> String.valueOf(Integer.parseInt(s, 16)))
+    		                .collect(Collectors.joining(".")));
+    			}
+    			//System.out.println(" et routerecord size: "+routeRecord.size());
+    	}
     }
     
     public String getSrcIPHex() {
@@ -129,10 +145,11 @@ public class IPv4 extends Protocol {
     					+ toStringFlags()
     				+ "\tFragment Offset: "+ fragmentOffset + "\n"
     				+ "\tTime to Live:" + TTL + "\n"
-    				+ "\tProtocol:" + protocol +"\n"
+    				+ "\tProtocol: TCP (" + protocol +")\n"
     				+ "\tHeader checksum: 0x" + checksum + checkChecksum() + "\n" 
     				+ "\tSource Address: " + srcIP  + "\n"
     				+ "\tDestination Address: " + dstIP + "\n" 
+    				+ toStringRouteRecord()
                 +'}';
     }
     
@@ -151,5 +168,30 @@ public class IPv4 extends Protocol {
     	res+= "set\n";
     	
     	return res;
+    }
+    
+    private String toStringRouteRecord() {
+    	String res = "";
+    	Boolean isNext = true;
+		if(routeRecord.size()==0) return res;
+		int length = 4 * Integer.parseInt(data.get(0).charAt(1)+"",16) - 20;
+		res+= "\tOptions: (" + length + "bytes), Record Route\n";
+		res+= "\t\tIP Option - Record Route (" + optionlength + "bytes)\n";
+		res+= "\t\t\tType: 7\n"
+			+ "\t\t\tLength: " + optionlength + "\n"
+			+ "\t\t\tPointer: " + pointer +"\n";
+		for(int i = 0; i < routeRecord.size(); i++){
+			if(routeRecord.get(i).equals("0.0.0.0") && isNext) {
+				res+="\t\t\tEmpty Route: 0.0.0.0 <- (next)\n";
+				isNext = false;
+			}
+			else if(routeRecord.get(i).equals("0.0.0.0")){
+				res+="\t\t\tEmpty Route: 0.0.0.0\n";
+			}
+			else res+= "\t\t\tRecorded Route: " + routeRecord.get(i) + "\n";
+			
+		}
+    	return res+= "\t\tIP Option - End of Options List (EOL)\n"
+				   + "\t\t\tType: 0\n";
     }
 }

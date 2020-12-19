@@ -9,7 +9,7 @@ public abstract class Protocol {
     protected final List<String> data;
 
     public Protocol(List<String> data, int headerLength, int footerLength) {
-    	System.out.println(data.size() + " headerlength = " + headerLength);
+    	//System.out.println(data.size() + " headerlength = " + headerLength);
         this.data = data;
         this.headerLength = headerLength;
         this.footerLength = footerLength;

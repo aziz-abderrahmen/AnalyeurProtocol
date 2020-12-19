@@ -35,14 +35,5 @@ public class Ethernet extends Protocol {
                 +"\tType: IPv4 (0x" + type + ")\n"
                 +'}';
     }
-    
-    public String getType() {
-    	String res = "";
-    	switch(type) {
-    	case "0800":
-    		res += " (Datagramme IP)";
-    		break;
-    	}
-    	return res;
-    }
+  
 }

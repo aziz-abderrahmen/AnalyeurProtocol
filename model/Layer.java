@@ -22,11 +22,17 @@ public class Layer {
 		init();
 	}
 	
+	public Layer(String name, List<String> data) {
+		this.name = name;
+		this.data = data;
+		init();
+	}
+	
 	private void init() {
 		switch(name) {
 		case "Ethernet":
 			protocol = new Ethernet(data);
-			sublayer = new Layer("IPv4", protocol.getPayload(), null);
+			sublayer = new Layer("IPv4", protocol.getPayload());
 			break;
 		case "IPv4":
 			protocol = new IPv4(data);
@@ -34,7 +40,7 @@ public class Layer {
 			break;
 		case "TCP":
 			protocol = new TCP(data, pseudoHeader);
-			sublayer = new Layer(getHTTPVersion(),protocol.getPayload(), null);
+			sublayer = new Layer(getHTTPVersion(),protocol.getPayload());
 			break;
 		case "HTTP/1.0":
 		case "HTTP/1.1":
