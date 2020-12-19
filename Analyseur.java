@@ -89,7 +89,7 @@ public class Analyseur{
     			System.out.print(hexa+" ");
     		}
     	}
-    	Layer l = new Layer("Ethernet", data.get(0));
+    	Layer l = new Layer("Ethernet", data.get(0), null);
     	System.out.println(l);
         System.out.println("Rien");
     }

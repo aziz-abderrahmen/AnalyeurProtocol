@@ -11,12 +11,14 @@ import model.protocols.TCP;
 public class Layer {
 	private String name;
 	private List<String> data;
+	private List<String> pseudoHeader;
 	private Protocol protocol;
 	private Layer sublayer;
 	
-	public Layer(String name, List<String> data) {
+	public Layer(String name, List<String> data, List<String> pseudoHeader) {
 		this.name = name;
 		this.data = data;
+		if (pseudoHeader!=null) this.pseudoHeader = pseudoHeader;
 		init();
 	}
 	
@@ -24,15 +26,15 @@ public class Layer {
 		switch(name) {
 		case "Ethernet":
 			protocol = new Ethernet(data);
-			sublayer = new Layer("IPv4", protocol.getPayload());
+			sublayer = new Layer("IPv4", protocol.getPayload(), null);
 			break;
 		case "IPv4":
 			protocol = new IPv4(data);
-			sublayer = new Layer("TCP", protocol.getPayload());
+			sublayer = new Layer("TCP", protocol.getPayload(),((IPv4)protocol).getPseudoHeader());
 			break;
 		case "TCP":
-			protocol = new TCP(data);
-			sublayer = new Layer(getHTTPVersion(),protocol.getPayload());
+			protocol = new TCP(data, pseudoHeader);
+			sublayer = new Layer(getHTTPVersion(),protocol.getPayload(), null);
 			break;
 		case "HTTP/1.0":
 		case "HTTP/1.1":

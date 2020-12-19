@@ -32,6 +32,12 @@ public class IPv4 extends Protocol {
     private String srcIP;
     private String dstIP;
     private List<String> options;
+    
+    //Pour avoir le pseudo entête pour TCP 
+    
+    private List<String> pseudoHeader;
+    private String srcIPHex;
+    private String dstIPHex;
 
 
     public IPv4(List<String> data) {
@@ -50,8 +56,9 @@ public class IPv4 extends Protocol {
         dstIP = data.subList(16, 20).stream()
                 .map(s -> String.valueOf(Integer.parseInt(s, 16)))
                 .collect(Collectors.joining("."));
-
         initOptions();
+        
+        pseudoHeader = data.subList(12, 20);
     }
 
     private void initFlagsAndFragmentOffset() {
@@ -70,6 +77,18 @@ public class IPv4 extends Protocol {
 
     private void initOptions(){
 
+    }
+    
+    public String getSrcIPHex() {
+    	return srcIPHex;
+    }
+    
+    public String getDstIPHex() {
+    	return dstIPHex;
+    }
+    
+    public List<String> getPseudoHeader(){
+    	return pseudoHeader;
     }
 
     private String checkChecksum() {
