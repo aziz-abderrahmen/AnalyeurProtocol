@@ -124,11 +124,11 @@ public class IPv4 extends Protocol {
     	res+= "set\n";
     	
     	res+= "\t\t" + "." + flagDF + ".. .... = Don't fragment : ";
-    	if(flagR.equals("0")) res += not;
+    	if(flagDF.equals("0")) res += not;
     	res+= "set\n";
     	
     	res+= "\t\t"+ ".." + flagMF + ". .... = More fragment : ";
-    	if(flagR.equals("0")) res += not;
+    	if(flagMF.equals("0")) res += not;
     	res+= "set\n";
     	
     	return res;
