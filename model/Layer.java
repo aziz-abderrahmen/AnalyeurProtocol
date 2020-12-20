@@ -40,6 +40,7 @@ public class Layer {
 			break;
 		case "TCP":
 			protocol = new TCP(data, pseudoHeader);
+			if(protocol.getPayload()!=null)
 			sublayer = new Layer(getHTTPVersion(),protocol.getPayload());
 			break;
 		case "HTTP/1.0":

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 public class IPv4 extends Protocol {
     private static final int version = 4;
+    private int headerLength;
     private String typeOfService;
     private String totalLength;
     private String identifier;
@@ -36,6 +37,7 @@ public class IPv4 extends Protocol {
     private List<String> routeRecord = new ArrayList<>();
     private int pointer;
     
+    
     //Pour avoir le pseudo entête pour TCP 
     
     private List<String> pseudoHeader;
@@ -45,6 +47,7 @@ public class IPv4 extends Protocol {
 
     public IPv4(List<String> data) {
         super(data, 4 * Integer.parseInt(data.get(0).charAt(1)+"",16), 0);
+        headerLength = Integer.parseInt(data.get(0).charAt(1)+"",16);
         typeOfService = data.get(1);
         totalLength = data.get(2) + data.get(3);
         identifier = data.get(4) + data.get(5);
@@ -141,6 +144,9 @@ public class IPv4 extends Protocol {
     @Override
     public String toString() {
     	return "\nInternet Protocol Version 4, srcIP=" + srcIP  + ", dstIP=" + dstIP + " { \n" 
+    				+ "\t0100 .... = Version: 4\n"
+    				+ "\t.... "+ String.format("%4s",Integer.toBinaryString(headerLength)).replace(' ', '0') + " Header Length: "+ headerLength*4 + " bytes (" + headerLength + ")\n"
+    				+ "\tType of service: 0x" + typeOfService +"\n"
     				+ "\tFlags : 0x" + flags + "\n "
     					+ toStringFlags()
     				+ "\tFragment Offset: "+ fragmentOffset + "\n"

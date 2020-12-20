@@ -22,7 +22,7 @@ public class TCP extends Protocol {
 	private int window;
 	private String checksum;
 	private int urgpointer;
-	private String options;
+	private List<String> options;
 	private int optionslength = 0;
 	private List<String> tcpData = new ArrayList<>();
 	
@@ -33,17 +33,19 @@ public class TCP extends Protocol {
     private String dstIPHex;
 	
     public TCP(List<String> data, List<String> pseudoHeader) {
-        super(data, 4 * Integer.parseInt(data.get(12).charAt(0)+""), 0); 
+        super(data, 4 * Integer.parseInt(data.get(12).charAt(0)+"",16), 0); 
         srcport = Integer.parseInt((data.get(0) + data.get(1)),16);
         dstport = Integer.parseInt((data.get(2) + data.get(3)),16);
         seqnum = Long.parseLong((data.get(4) + data.get(5) + data.get(6) + data.get(7)),16);
         acknum = Long.parseLong((data.get(8) + data.get(9) + data.get(10) + data.get(11)),16);
-        headerlength = Integer.parseInt(data.get(12).charAt(0)+"");
+        headerlength = Integer.parseInt(data.get(12).charAt(0)+"",16);
         reserved = "0000 00";
         initFlags(data);
         window = Integer.parseInt(data.get(14) + data.get(15),16);
         checksum = data.get(16) + data.get(17);
         urgpointer = Integer.parseInt((data.get(18) + data.get(19)),16);
+        int length = 4 * Integer.parseInt(data.get(12).charAt(0)+"",16);
+        if(length>20) options = data.subList(20, length);
         tcpData.addAll(data.subList(20 + optionslength, data.size()));
         initPseudoHeader(data, pseudoHeader);
     }
@@ -85,6 +87,47 @@ public class TCP extends Protocol {
     	pseudoHeader.add(l.substring(0, 2));
     	pseudoHeader.add(l.substring(2, 4));
     }
+    
+    private String toStringOptions(List<String> options) {
+    	String res = "\t\tType: 0x" + options.get(0);
+    	if(options == null) return "";
+    	switch(options.get(0)) {
+    		case("00"):
+    			res+= " EOL End of Options List\n";
+    			break;
+    		case("01"):
+    			res+= " (NOP) No Operation\n" + toStringOptions(options.subList(1, options.size()));;
+    			break;
+    		case("02"):
+    			String mss = options.get(2) + options.get(3);
+    			res+= " (MSS), MSS: 0x" + mss + " (" + Integer.parseInt(mss,16) + ")\n";
+    			if(options.size()>4) res+= toStringOptions(options.subList(4, options.size()));
+    			break;
+    		case("03"):
+    			res+= " (WScale) , Décalage : " + options.get(2) + "\n";
+    			if(options.size()>3) res+= toStringOptions(options.subList(3, options.size()));
+    			break;
+    		case("04"):
+    			res+= " Sack Permitted\n";
+    			if(options.size()>2) res+= toStringOptions(options.subList(2, options.size()));
+    			break;
+    		case("08"):
+    			String tsv = options.get(2) + options.get(3) + options.get(4) + options.get(5);
+    			String ter = options.get(6) + options.get(7) + options.get(8) + options.get(9);
+    			res+= " (Time Stamp) , TSV : 0x" + tsv + ", TER: 0x" + ter + "\n";
+    			if(options.size()>10) res+= toStringOptions(options.subList(10, options.size()));
+    			break;
+    		case("09"):
+    			break;
+    		case("0a"):
+    			break;
+    		case("0e"):
+    			break;
+   	    			
+    	}
+    	return res;
+    }
+    
     
     private String checkChecksum() {
         /** Addition des hexas de l'entÃªte
@@ -136,7 +179,8 @@ public class TCP extends Protocol {
     				+ "\tWindow: " + window + "\n"
     				+ "\tChecksum: 0x" + checksum + checkChecksum() + "\n"
     				+ "\tUrgent pointer: " + urgpointer + "\n"
-    				+ "\tTCP payload (" + getPayload().size() + " bytes)\n"
+    				//+ "\tTCP payload (" + getPayload().size() + " bytes)\n"
+    				+ toStringOptions(options)
                 +'}';
     }
     
