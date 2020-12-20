@@ -89,8 +89,8 @@ public class TCP extends Protocol {
     }
     
     private String toStringOptions(List<String> options) {
-    	String res = "\t\tType: 0x" + options.get(0);
     	if(options == null) return "";
+    	String res = "\t\tType: 0x" + options.get(0);
     	switch(options.get(0)) {
     		case("00"):
     			res+= " EOL End of Options List\n";
