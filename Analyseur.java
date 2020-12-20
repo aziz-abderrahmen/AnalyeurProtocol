@@ -82,17 +82,30 @@ public class Analyseur{
         return false;
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
     	List<List<String>> data = Analyseur.readFile(Analyseur.setupFileStream());
     	for(List<String> elem : data) {
     		for(String hexa : elem) {
     			System.out.print(hexa+" ");
     		}
     	}
+    	FileWriter myWriter = null;
+    	try {
+    	      myWriter = new FileWriter("Analyseur.txt");
+    	    } catch (IOException e) {
+    	      System.out.println("An error occurred.");
+    	      e.printStackTrace();
+    	    }
     	System.out.print("\n");
     	for(List<String> elem : data) {
     		Layer l = new Layer("Ethernet", elem);
         	System.out.println(l);
+        	try {
+				myWriter.write(l.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        	myWriter.close();
             System.out.println("Rien");
     	}
     	

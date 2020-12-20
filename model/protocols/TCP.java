@@ -23,7 +23,7 @@ public class TCP extends Protocol {
 	private String checksum;
 	private int urgpointer;
 	private List<String> options;
-	private int optionslength = 0;
+	private int optionsLength = 0;
 	private List<String> tcpData = new ArrayList<>();
 	
 	//Pour avoir le pseudo entête
@@ -45,8 +45,11 @@ public class TCP extends Protocol {
         checksum = data.get(16) + data.get(17);
         urgpointer = Integer.parseInt((data.get(18) + data.get(19)),16);
         int length = 4 * Integer.parseInt(data.get(12).charAt(0)+"",16);
-        if(length>20) options = data.subList(20, length);
-        tcpData.addAll(data.subList(20 + optionslength, data.size()));
+        if(length>20) {
+        	options = data.subList(20, length);
+        	optionsLength = length - 20;
+        }
+        tcpData.addAll(data.subList(20 + optionsLength, data.size()));
         initPseudoHeader(data, pseudoHeader);
     }
     
@@ -179,9 +182,18 @@ public class TCP extends Protocol {
     				+ "\tWindow: " + window + "\n"
     				+ "\tChecksum: 0x" + checksum + checkChecksum() + "\n"
     				+ "\tUrgent pointer: " + urgpointer + "\n"
-    				//+ "\tTCP payload (" + getPayload().size() + " bytes)\n"
-    				+ toStringOptions(options)
+    				+ testOptions(options)
                 +'}';
+    }
+    
+    private String testOptions(List<String> options) {
+    	if(optionsLength>0) return "\tOptions: (" + optionsLength +" bytes)\n" +  toStringOptions(options);
+    	return "";
+    }
+    
+    private String toStringPayload() {
+    	if (getPayload()!=null) return "\tTCP payload (" + getPayload().size() + " bytes)\n";
+    	return "";
     }
     
     private String toStringFlags() {
