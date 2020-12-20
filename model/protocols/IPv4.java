@@ -111,9 +111,9 @@ public class IPv4 extends Protocol {
     }
 
     private String checkChecksum() {
-        /** Addition des hexas de l'entête
-         * Si résultat supérieur à 16 bits :
-         * On additionne les 16 bits "high" avec les 16 bits "low" (high et low comme en archi)
+        /** Addition des hexas de l'entete
+         * Si resultat superieur à 16 bits :
+         * On additionne les 16 bits "high" avec les 16 bits "low" 
          * res = (somme & 0xFFFF) + (somme >> 16)
          * pas d'erreurs si res = 0xFFFF
          */

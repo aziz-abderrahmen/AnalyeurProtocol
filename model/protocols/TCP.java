@@ -144,7 +144,7 @@ public class TCP extends Protocol {
         //On y ajoute le pseudo en-tête
         header.addAll(pseudoHeader);
         
-        // On crÃ©e la liste d'hexas de 2 octets
+        // On cree la liste d'hexas de 2 octets
         List<String> hexs = new ArrayList<>();
         
         
@@ -157,8 +157,6 @@ public class TCP extends Protocol {
         for (String hex : hexs) {
             sum += Integer.parseInt(hex, 16);
         }
-        
-        
 
         // On somme les bits de poids forts et faibles
         if (sum > 0xFFFF) {

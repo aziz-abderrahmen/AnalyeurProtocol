@@ -1,4 +1,5 @@
 
+import java.awt.Desktop;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,6 +108,14 @@ public class Analyseur{
 			}
         	myWriter.close();
             System.out.println("Rien");
+    	}
+    	
+    	if(Desktop.getDesktop().isSupported(java.awt.Desktop.Action.OPEN)){
+    	    try {
+    	        java.awt.Desktop.getDesktop().open(new File("Analyseur.txt"));
+    	    } catch (IOException ex) {
+    	       ex.printStackTrace();
+    	    }
     	}
     	
     }
