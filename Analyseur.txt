@@ -1,0 +1,45 @@
+Ethernet II, Src: 00:01:02:a5:fc:8d, Dst: 00:01:02:a5:fb:3a {
+	Destination: 00:01:02:a5:fc:8d
+	Source: 00:01:02:a5:fb:3a
+	Type: IPv4 (0x0800)
+}
+Internet Protocol Version 4, srcIP=10.33.182.182, dstIP=132.227.60.13 { 
+	0100 .... = Version: 4
+	.... 0101 Header Length: 20 bytes (5)
+	Type of service: 0x00
+	Flags : 0x40
+ 		0... .... = Reserved bit : Not set
+		.1.. .... = Don't fragment : set
+		..0. .... = More fragment : Not set
+	Fragment Offset: 0
+	Time to Live:64
+	Protocol: TCP (06)
+	Header checksum: 0xcccd [Correct]
+	Source Address: 10.33.182.182
+	Destination Address: 132.227.60.13
+}
+Transmission Control Protocol , Src Port: 3765, Dst Port:80 { 
+	Source Port: 3765
+	Destination Port:80
+	Sequence Number: 2840957540
+	[Next Sequence Number: 2840957541]
+	Acknowledgment Number: 0
+	1010 .... = Header Length : 40 bytes (10)
+	Flags: 0x002
+		000000.. .... = Reserved : set
+		.... ..0. .... = Urgent : Not set
+		.... ...0 .... = Acknowledgment : Not set
+		.... .... 0... = Push : Not set
+		.... .... .0.. = Reset : Not set
+		.... .... ..1. = Syn : set
+		.... .... ...0 = Fin : Not set
+	Window: 16060
+	Checksum: 0xa374 [Incorrect]
+	Urgent pointer: 0
+	Options: (20 bytes)
+		Type: 0x02 (MSS), MSS: 0x05b4 (1460)
+		Type: 0x04 Sack Permitted
+		Type: 0x08 (Time Stamp) , TSV : 0x08399116, TER: 0x00000000
+		Type: 0x01 (NOP) No Operation
+		Type: 0x03 (WScale) , Décalage : 00
+}
