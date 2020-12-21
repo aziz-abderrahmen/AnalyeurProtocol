@@ -54,6 +54,7 @@ public class Analyseur{
     			int offset = Integer.parseInt(listOfHex.get(0),16);
         		if(offset == 0 && listhexa.size()!=0) {
         			res.add(listhexa);
+        			listhexa = new ArrayList<>();
         			pos = 0;
         		}
         		if(offset == pos) {
@@ -106,9 +107,10 @@ public class Analyseur{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-        	myWriter.close();
+        	
             System.out.println("Rien");
     	}
+    	myWriter.close();
     	
     	if(Desktop.getDesktop().isSupported(java.awt.Desktop.Action.OPEN)){
     	    try {

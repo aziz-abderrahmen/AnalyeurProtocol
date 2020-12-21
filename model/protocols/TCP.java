@@ -72,23 +72,14 @@ public class TCP extends Protocol {
     }
     
     private void initPseudoHeader(List<String> data, List<String> ps) {
-    	this.pseudoHeader.addAll(ps);
-    	pseudoHeader.add("00");
+    	pseudoHeader.addAll(ps);
+    	pseudoHeader.add("00");	//Zero
     	pseudoHeader.add("06"); //code hexadecimal de TCP
-    	pseudoHeader.add(data.get(0));
-    	pseudoHeader.add(data.get(1));
-    	pseudoHeader.add(data.get(2));
-    	pseudoHeader.add(data.get(3));
-    	pseudoHeader.add(data.get(16));
-    	pseudoHeader.add(data.get(17));
-    	pseudoHeader.addAll(tcpData);
-    	String length = String.valueOf(tcpData.size() + 8);
+    	String length = String.valueOf(data.size());
     	String l = String.format("%4s",new BigInteger(length).toString(16)).replace(' ', '0');
     	//System.out.println("La taille vaut:" + l.substring(0, 2));
     	pseudoHeader.add(l.substring(0, 2));
-    	pseudoHeader.add(l.substring(2, 4));
-    	pseudoHeader.add(l.substring(0, 2));
-    	pseudoHeader.add(l.substring(2, 4));
+    	pseudoHeader.add(l.substring(2, 4)); 
     }
     
     private String toStringOptions(List<String> options) {
@@ -133,23 +124,27 @@ public class TCP extends Protocol {
     
     
     private String checkChecksum() {
-        /** Addition des hexas de l'entÃªte
-         * Si rÃ©sultat supÃ©rieur Ã  16 bits :
-         * On additionne les 16 bits "high" avec les 16 bits "low" (high et low comme en archi)
+    	/** Addition des hexas de l'entete
+         * Si resultat superieur Ã  16 bits :
+         * On additionne les 16 bits "high" avec les 16 bits "low" 
          * res = (somme & 0xFFFF) + (somme >> 16)
          * pas d'erreurs si res = 0xFFFF
          */
     	if (checksum.equals("0000")) return " [validation disabled]";
-        List<String> header = new ArrayList<>();
-        //On y ajoute le pseudo en-tête
-        header.addAll(pseudoHeader);
+        List<String> donnee = new ArrayList<>();
+        //On y ajoute le pseudo en-tête et l'entete ainsi que les données
+        donnee.addAll(pseudoHeader);
+        donnee.addAll(data);
+        
+        //Si les données sont impaires
+        if(donnee.size()%2 == 1) donnee.add("00");
         
         // On cree la liste d'hexas de 2 octets
         List<String> hexs = new ArrayList<>();
         
         
-        for(int i = 0; i < header.size(); i+=2) {
-            hexs.add(header.get(i) + header.get(i + 1));
+        for(int i = 0; i < donnee.size(); i+=2) {
+            hexs.add(donnee.get(i) + donnee.get(i + 1));
         }
 
         // On fait la somme
@@ -162,6 +157,7 @@ public class TCP extends Protocol {
         if (sum > 0xFFFF) {
             sum = (sum >> 16) + (sum & 0xFFFF) ;
         }
+        //System.out.println("resulat du checksum : " + Integer.toHexString(sum));
         if(sum == 0xFFFF) return " [Correct]";
         else return " [Incorrect]";
     }

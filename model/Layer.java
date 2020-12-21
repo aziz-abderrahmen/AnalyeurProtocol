@@ -41,10 +41,9 @@ public class Layer {
 		case "TCP":
 			protocol = new TCP(data, pseudoHeader);
 			if(protocol.getPayload()!=null)
-			sublayer = new Layer(getHTTPVersion(),protocol.getPayload());
+			sublayer = new Layer("HTTP",protocol.getPayload());
 			break;
-		case "HTTP/1.0":
-		case "HTTP/1.1":
+		case "HTTP":
 			protocol = new HTTP(data, name);
 			sublayer = null;
 			break;
@@ -52,46 +51,26 @@ public class Layer {
 		
 	}
 
-	private String getHTTPVersion() {
-        return "HTTP/1.0";
-    }
-
     public Protocol getProtocol() {
         return protocol;
     }
-
-    /*
-    @Override
-    public String toString() {
-        int cpt = 0;
-        String res = "";
-        for (int i = 0; i < data.size(); i++) {
-            res += data.get(i) + " ";
-            cpt ++;
-            if (cpt == 16) {
-                res += "\n";
-                cpt = 0;
-            }
-        }
-        return res;
-    }*/
     
     public String toString() {
-    	StringBuilder res = new StringBuilder();
+    	String res = "";
 		if (protocol instanceof Ethernet)
-			res.append(((Ethernet)protocol).toString());
+			res += (((Ethernet)protocol).toString());
 		
 		if (protocol instanceof IPv4)
-			res.append(((IPv4)protocol).toString());
+			res+=(((IPv4)protocol).toString());
 			
 		if (protocol instanceof TCP)
-			res.append(((TCP)protocol).toString());
+			res+=(((TCP)protocol).toString());
 			
 		if (protocol instanceof HTTP)
-			res.append(((HTTP)protocol).toString());
+			res+=(((HTTP)protocol).toString());
 		
     	if(sublayer!=null)
-		return res.append(sublayer.toString()).toString();
+		return res+=(sublayer.toString()).toString();
     	else return res.toString();
     }
 
